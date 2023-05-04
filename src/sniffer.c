@@ -60,7 +60,7 @@ Ifaces GetAvailableIfaces()
 void *Start(void *data)
 {
 	IsRunning = 1;
-	char *iface = ReadConfig();
+	char *iface = (char *)data;
 	int saddr_size, data_size;
 	struct sockaddr saddr;
 
@@ -81,7 +81,7 @@ void *Start(void *data)
 			pthread_exit(NULL);
 		}
 		saddr_size = sizeof saddr;
-		
+
 		data_size = recvfrom(sock_raw, buffer, 65536, 0, &saddr, (socklen_t *)&saddr_size);
 		if (data_size < 0)
 		{
@@ -104,7 +104,7 @@ void *Start(void *data)
 		{
 			list.ips[id].count++;
 		}
-		
+
 		WriteToResult(iface, list);
 	}
 }

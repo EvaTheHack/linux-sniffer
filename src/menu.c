@@ -13,7 +13,7 @@ void ShowStatisticByIface();
 void Stop(pthread_t thread);
 
 void ClearConsole();
-void PrintInfo(char *message);
+void PrintInfo(char *message, char *additional);
 void PrintError(char *message);
 
 void StartMenu(pthread_t thread)
@@ -59,14 +59,15 @@ void StartMenu(pthread_t thread)
 
 void StartSniff(pthread_t thread)
 {
-    pthread_create(&thread, NULL, Start, NULL);
-    PrintInfo("Sniffing started");
+    char *iface = ReadConfig();
+    pthread_create(&thread, NULL, Start, (void *)iface);
+    PrintInfo("Sniffing started on the\n", iface);
 }
 
 void Stop(pthread_t thread)
 {
     StopSniffing();
-    PrintInfo("Sniffing stopped");
+    PrintInfo("Sniffing stopped", "");
 }
 
 void ShowCountByIp()
@@ -85,7 +86,7 @@ void ShowCountByIp()
     }
     else
     {
-        PrintInfo("IP founded");
+        PrintInfo("IP founded\n", "");
         Ip ip = list.ips[id];
         printf("IP: %s; Count:%d\n", ip.address, ip.count);
     }
@@ -107,7 +108,7 @@ void ShowAvailableIfaces()
         {
             WriteToConfig(ifaces.ifaces[i]);
             ClearConsole();
-            PrintInfo("Config has been setuped\n");
+            PrintInfo("Config has been setuped\n", "");
             return;
         }
     }
@@ -130,7 +131,7 @@ void ShowStatisticByIface()
         return;
     }
 
-    PrintInfo("Statistic found");
+    PrintInfo("Statistic found\n", "");
     ListIp list = ReadFromResult(iface);
     for (int i = 0; i < list.count; i++)
     {
@@ -140,10 +141,10 @@ void ShowStatisticByIface()
     printf("\n");
 }
 
-void PrintInfo(char *message)
+void PrintInfo(char *message, char *additional)
 {
     printf("\033[0;32m");
-    printf("%s\n", message);
+    printf("%s %s\n", message, additional);
     printf("\033[0m");
 }
 
