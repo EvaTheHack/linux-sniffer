@@ -1,39 +1,54 @@
+PID_FILE=/var/run/daemon_sniffer.pid
+
 DAEMON_NAME="daemon_sniffer"
 
 DAEMON_PATH=DEAMON_PATH_VAR
 
+is_running() {
+    if [ -f $PID_FILE ]; then
+        pid=$(cat $PID_FILE)
+        if [ -d "/proc/$pid" ]; then
+            return 0 
+        fi
+    fi
+    return 1 
+}
+
 start() {
-    if pgrep -f $DAEMON_NAME > /dev/null; then
-        echo "$DAEMON_NAME is already running."
+    if ! is_running; then
+        $DAEMON &
+        pid=$!
+        echo $pid > $PID_FILE
+        echo "Daemon started with PID $pid"
     else
-        $DAEMON_PATH &
-        echo "$DAEMON_NAME started."
+        echo "Daemon is already running"
     fi
 }
 
 stop() {
-    if pgrep -f $DAEMON_NAME > /dev/null; then
-        pkill -f $DAEMON_NAME
-        echo "$DAEMON_NAME stopped."
+    if is_running; then
+        kill $(cat $PID_FILE)
+        rm $PID_FILE
+        echo "Daemon stopped"
     else
-        echo "$DAEMON_NAME is not running."
+        echo "Daemon is not running"
     fi
 }
 
-reload() {
-    if pgrep -f $DAEMON_NAME > /dev/null; then
-        pkill -HUP -f $DAEMON_NAME
-        echo "$DAEMON_NAME reloaded."
+reload() { 
+    if is_running; then
+        kill -HUP $(cat $PID_FILE)
+        echo "Daemon reloaded"
     else
-        echo "$DAEMON_NAME is not running."
+        echo "Daemon is not running"
     fi
 }
 
 status() {
-    if pgrep -f $DAEMON_NAME > /dev/null; then
-        echo "$DAEMON_NAME is running."
+    if is_running; then
+        echo "Daemon is running with PID $(cat $PID_FILE)"
     else
-        echo "$DAEMON_NAME is not running."
+        echo "Daemon is not running"
     fi
 }
 
