@@ -9,7 +9,7 @@ apt-get install make
 cd linux-sniffer
 chmod +x init.sh
 chmod +x init_daemon.sh
-./init.sh
+source ./init.sh
 sudo ./init_daemon.sh
 ```
 
