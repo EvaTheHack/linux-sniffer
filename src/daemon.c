@@ -111,7 +111,6 @@ void ChooseAction(char **commands, int msgid)
             SendMessage("Allowed only eth and wlan ifaces", msgid, 2);
             return;
         }
-
         Ifaces ifaces = GetAvailableIfaces();
         char option;
 

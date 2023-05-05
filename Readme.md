@@ -1,5 +1,5 @@
 # Linux sniffer
-### Service that collects statistic about network traffic and store to txt
+Service that collects statistic about network traffic and store to txt
 
 ## How to setup
 
@@ -7,8 +7,7 @@
 git clone https://github.com/EvaTheHack/linux-sniffer.git
 cd linux-sniffer
 chmod +x init.sh & chmod +x init_daemon.sh
-./init.sh
-sudo ./init_daemon.sh
+sudo ./init.sh
 ```
 
 ## Usage 
@@ -23,7 +22,7 @@ sudo service daemon_sniffer reload - stop and start daemon
 
 ### Another commands for cli:
 
-Then go to output folder and you can use commands below
+Then go to output folder and you can use commands below:
 ```
 sudo ./sniffer start
 ```

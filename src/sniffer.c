@@ -80,7 +80,7 @@ void *Start(void *data)
 
 	while (1)
 	{
-		if(!IsRunning)
+		if (!IsRunning)
 		{
 			close(sock_raw);
 			pthread_exit(NULL);
