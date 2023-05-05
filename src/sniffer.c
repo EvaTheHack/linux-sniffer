@@ -61,12 +61,18 @@ void *Start(void *data)
 {
 	IsRunning = 1;
 	char *iface = (char *)data;
+	char iface_str[10];
 	int saddr_size, data_size;
 	struct sockaddr saddr;
+	trim(iface);
+	for (int i = 0; i < strlen(iface); i++)
+	{
+		iface_str[i] = iface[i];
+	}
 
 	unsigned char *buffer = (unsigned char *)malloc(65536);
 	int sock_raw = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
-	int sock_option = setsockopt(sock_raw, SOL_SOCKET, SO_BINDTODEVICE, "eth0", strlen("eth0") + 1);
+	int sock_option = setsockopt(sock_raw, SOL_SOCKET, SO_BINDTODEVICE, iface_str, strlen(iface_str) + 1);
 	if (sock_raw < 0 || sock_option < 0)
 	{
 		perror("Socket Error");
@@ -75,7 +81,7 @@ void *Start(void *data)
 
 	while (1)
 	{
-		if(!IsRunning)
+		if (!IsRunning)
 		{
 			close(sock_raw);
 			pthread_exit(NULL);
