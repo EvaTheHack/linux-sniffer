@@ -30,10 +30,11 @@ int main(int argc, char **argv)
         perror("msgget");
         return 1;
     }
-    if (strcmp(argv[1], "--help") == 0 || argc == 1)
+    
+    if (argc == 1 || strcmp(argv[1], "--help") == 0)
     {
         PrintHelp();
-        return 0;
+        return 1;
     }
 
     memset(&message_snd, 0, sizeof(message_snd));

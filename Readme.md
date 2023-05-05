@@ -7,7 +7,7 @@
 git clone https://github.com/EvaTheHack/linux-sniffer.git
 cd linux-sniffer
 chmod +x init.sh & chmod +x init_daemon.sh
-source ./init.sh
+./init.sh
 sudo ./init_daemon.sh
 ```
 
@@ -22,6 +22,11 @@ sudo service daemon_sniffer reload - stop and start daemon
 ```
 
 ### Another commands for cli:
+
+Then go to output folder and you can use commands below
+```
+sudo ./sniffer start
+```
 
 ```
 start - start sniffing 
