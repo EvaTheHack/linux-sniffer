@@ -6,7 +6,7 @@ Service that collects statistic about network traffic and store to txt
 ```
 git clone https://github.com/EvaTheHack/linux-sniffer.git
 cd linux-sniffer
-chmod +x init.sh & chmod +x init_daemon.sh
+chmod +x init.sh
 sudo ./init.sh
 ```
 
