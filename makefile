@@ -1,4 +1,4 @@
-all: create_folders create_config create_daemon create_cli
+all: create_folders create_config create_result_path create_daemon create_cli
 
 create_folders:
 	$(shell mkdir -p output)
@@ -7,6 +7,10 @@ create_folders:
 create_config:
 	touch config.txt
 	echo "eth0" > config.txt
+
+create_result_path:
+	touch results_path.txt
+	echo "$(CURDIR)/results" > results_path.txt
 
 create_daemon:
 	gcc src/daemon.c -o output/daemon_sniffer

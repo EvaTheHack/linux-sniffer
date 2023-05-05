@@ -19,6 +19,7 @@ typedef struct message
 
 pthread_t thread;
 
+int StartWith(const char *str, const char *substr);
 void PrintHelp();
 void ChooseAction(char **commands, int msgid);
 char **SplitMessage(char message[128]);
@@ -92,10 +93,28 @@ void ChooseAction(char **commands, int msgid)
     }
     if (strcmp(commands[0], "select") == 0)
     {
+        if (IsRunning)
+        {
+            SendMessage("You can not change iface while it works", msgid, 2);
+            return;
+        }
+
         char *iface = commands[2];
+
+        char *eth = malloc(sizeof(char) * 5);
+        strcpy(eth, "eth");
+        char *wlan = malloc(sizeof(char) * 5);
+        strcpy(wlan, "wlan");
+
+        if (!StartWith(iface, eth) || !StartWith(iface, wlan))
+        {
+            SendMessage("Allowed only eth and wlan ifaces", msgid, 2);
+            return;
+        }
+
         Ifaces ifaces = GetAvailableIfaces();
         char option;
-        fflush(stdout);
+
         for (int i = 0; i < ifaces.count; i++)
         {
             if (strcmp(ifaces.ifaces[i], iface) == 0)
@@ -109,9 +128,24 @@ void ChooseAction(char **commands, int msgid)
     }
     if (strcmp(commands[0], "stat") == 0)
     {
-        char *iface = commands[1];
         char buffer[MSGSZ];
         buffer[0] = '\0';
+
+        if (commands[1] == NULL)
+        {
+            ListIp list = GetAllFromResults();
+            for (int i = 0; i < list.count; i++)
+            {
+                char formatted[30];
+                Ip ip = list.ips[i];
+                sprintf(formatted, "IP: %s; Count:%d\n", ip.address, ip.count);
+                strcat(buffer, formatted);
+            }
+            SendMessage(buffer, msgid, 1);
+            return;
+        }
+
+        char *iface = commands[1];
         if (!CheckIfFileExist(iface))
         {
             SendMessage("Make sure, that file for this iface exist", msgid, 2);
@@ -164,4 +198,17 @@ char **SplitMessage(char message[128])
         token = strtok(NULL, " ");
     }
     return commands;
+}
+
+int StartWith(const char *str, const char *substr)
+{
+    int lenstr = strlen(str);
+    int lensubstr = strlen(substr);
+
+    if (lensubstr > lenstr)
+    {
+        return 0;
+    }
+
+    return strncmp(substr, str, lensubstr) == 0;
 }
