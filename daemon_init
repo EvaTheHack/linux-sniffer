@@ -1,5 +1,3 @@
-PID_FILE=/var/run/daemon_sniffer.pid
-
 DAEMON_NAME="daemon_sniffer"
 
 DAEMON_PATH=DEAMON_PATH_VAR
