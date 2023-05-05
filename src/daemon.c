@@ -92,7 +92,19 @@ void ChooseAction(char **commands, int msgid)
     }
     if (strcmp(commands[0], "select") == 0)
     {
+        if(IsRunning)
+        {
+            SendMessage("You can not change iface while it works", msgid, 2);
+            return;
+        }
+
         char *iface = commands[2];
+        if(!StartWith(iface, "eth") || !StartWith(iface, "wlan"))
+        {
+            SendMessage("Allowed only eth and wlan ifaces", msgid, 2);
+            return;
+        }
+        
         Ifaces ifaces = GetAvailableIfaces();
         char option;
         fflush(stdout);
@@ -164,4 +176,15 @@ char **SplitMessage(char message[128])
         token = strtok(NULL, " ");
     }
     return commands;
+}
+
+int StartWith(const char *str, const char *substr) {
+    int lenstr = strlen(str);
+    int lensubstr = strlen(substr);
+    
+    if (lensubstr > lenstr) {
+        return 0;
+    }
+    
+    return strncmp(substr, str, lensubstr) == 0;
 }
