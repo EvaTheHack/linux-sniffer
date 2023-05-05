@@ -20,7 +20,7 @@ void trim(char *str);
 
 void WriteToConfig(char *iface)
 {
-    config = fopen("/home/mr_nachtigal/projects/sniff_last/output/config.txt", "w");
+    config = fopen("config.txt", "w");
     int length = strlen(iface);
     for (int i = 0; i < length; i++)
     {
@@ -32,10 +32,12 @@ void WriteToConfig(char *iface)
 char *ReadConfig()
 {
     char myString[10];
-    config = fopen("/home/mr_nachtigal/projects/sniff_last/output/config.txt", "r");
+    config = fopen("config.txt", "r");
     if(config == NULL)
     {
-        printf("111111\n");
+        result = fopen("config.txt", "w");
+        fclose(result);
+        result = fopen("config.txt", "r");
     }
     fgets(myString, 10, config);
     fclose(config);
@@ -55,7 +57,7 @@ void WriteToResult(char *filename, ListIp list)
 
     strncpy(path, filename, sizeof(filename));
     strncat(path, extension, (sizeof(path) - strlen(path)));
-    result = fopen("/home/mr_nachtigal/projects/sniff_last/output/eth0.txt", "w");
+    result = fopen("eth0.txt", "w");
 
     for (int i = 0; i < list.count; i++)
     {
@@ -75,12 +77,12 @@ ListIp ReadFromResult(char *filename)
     strncpy(path, filename, sizeof(filename));
     strncat(path, extension, (sizeof(path) - strlen(path)));
 
-    result = fopen("/home/mr_nachtigal/projects/sniff_last/output/eth0.txt", "r");
+    result = fopen("eth0.txt", "r");
     if(result == NULL)
     {
-        result = fopen("/home/mr_nachtigal/projects/sniff_last/output/eth0.txt", "w");
+        result = fopen("eth0.txt", "w");
         fclose(result);
-        result = fopen("/home/mr_nachtigal/projects/sniff_last/output/eth0.txt", "r");
+        result = fopen("eth0.txt", "r");
     }
     int capacity = 1;
     int count = 0;

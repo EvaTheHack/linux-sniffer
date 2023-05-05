@@ -30,7 +30,7 @@ int main(int argc, char **argv)
         perror("msgget");
         return 1;
     }
-    if (strcmp(argv[1], "--help") == 0)
+    if (strcmp(argv[1], "--help") == 0 || argc == 1)
     {
         PrintHelp();
         return 0;
