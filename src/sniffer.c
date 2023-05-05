@@ -85,6 +85,7 @@ void *Start(void *data)
 			close(sock_raw);
 			pthread_exit(NULL);
 		}
+
 		saddr_size = sizeof saddr;
 		data_size = recvfrom(sock_raw, buffer, 65536, 0, &saddr, (socklen_t *)&saddr_size);
 		if (data_size < 0)

@@ -31,6 +31,8 @@ int main(int argc, char **argv)
         return 1;
     }
     
+
+
     if (argc == 1 || strcmp(argv[1], "--help") == 0)
     {
         PrintHelp();
@@ -49,6 +51,13 @@ int main(int argc, char **argv)
     msgsnd(msgid, &message_snd, buf_length, IPC_NOWAIT);
 
     msgrcv(msgid, &message_get, MSGSZ, 0, 0);
+
+    if(strcmp(message_snd.mtext, message_get.mtext) == 0)
+    {
+        PrintError("Daemon did not receive request. Try to run on daemon.");
+        return 0;
+    }
+
     if (message_get.mtype == 1)
     {
         PrintInfo(message_get.mtext);

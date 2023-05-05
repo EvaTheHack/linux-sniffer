@@ -46,6 +46,7 @@ int main()
         }
 
         char **commands = (char **)malloc(10 * sizeof(char *));
+        Log(msg.mtext);
         commands = SplitMessage(msg.mtext);
 
         ChooseAction(commands, msgid);
@@ -130,7 +131,13 @@ void ChooseAction(char **commands, int msgid)
         char buffer[MSGSZ];
         buffer[0] = '\0';
 
-        if (commands[1] == NULL)
+
+        char *eth = malloc(sizeof(char) * 5);
+        strcpy(eth, "eth");
+        char *wlan = malloc(sizeof(char) * 5);
+        strcpy(wlan, "wlan");
+
+        if (commands[1] == NULL || !StartWith(commands[1], eth) || !StartWith(commands[1], wlan))
         {
             ListIp list = GetAllFromResults();
             for (int i = 0; i < list.count; i++)
@@ -143,8 +150,9 @@ void ChooseAction(char **commands, int msgid)
             SendMessage(buffer, msgid, 1);
             return;
         }
-
+        
         char *iface = commands[1];
+        Log(iface);
         if (!CheckIfFileExist(iface))
         {
             SendMessage("Make sure, that file for this iface exist", msgid, 2);
@@ -191,6 +199,7 @@ char **SplitMessage(char message[128])
     int i = 0;
     while (token != NULL)
     {
+        Log("givno");
         commands[i] = token;
         i++;
         // Отримуємо наступний токен
