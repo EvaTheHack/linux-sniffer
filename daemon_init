@@ -16,7 +16,7 @@ is_running() {
 
 start() {
     if ! is_running; then
-        $DAEMON &
+        $DAEMON_PATH &
         pid=$!
         echo $pid > $PID_FILE
         echo "Daemon started with PID $pid"
