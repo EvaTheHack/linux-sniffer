@@ -16,10 +16,10 @@ sudo ./init_daemon.sh
 ### Before start daemon must be started
 ### All commands for work with daemon:
 ```
-service daemon_sniffer start  - start a daemon
-service daemon_sniffer stop   - stop a daemon
-service daemon_sniffer status - show status of daemon
-service daemon_sniffer reload - stop and start daemon
+sudo service daemon_sniffer start  - start a daemon
+sudo service daemon_sniffer stop   - stop a daemon
+sudo service daemon_sniffer status - show status of daemon
+sudo service daemon_sniffer reload - stop and start daemon
 ```
 
 ### Another commands for cli:
