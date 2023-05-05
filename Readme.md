@@ -5,7 +5,6 @@
 
 ```
 git clone https://github.com/EvaTheHack/linux-sniffer.git
-sudo apt-get install make
 cd linux-sniffer
 chmod +x init.sh
 chmod +x init_daemon.sh
