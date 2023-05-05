@@ -1,4 +1,4 @@
-DAEMON_NAME="mydaemon"
+DAEMON_NAME="daemon_sniffer"
 
 DAEMON_PATH=DEAMON_PATH_VAR
 
@@ -6,7 +6,6 @@ start() {
     if pgrep -f $DAEMON_NAME > /dev/null; then
         echo "$DAEMON_NAME is already running."
     else
-        echo "Starting $DAEMON_NAME..."
         $DAEMON_PATH &
         echo "$DAEMON_NAME started."
     fi
@@ -14,7 +13,6 @@ start() {
 
 stop() {
     if pgrep -f $DAEMON_NAME > /dev/null; then
-        echo "Stopping $DAEMON_NAME..."
         pkill -f $DAEMON_NAME
         echo "$DAEMON_NAME stopped."
     else
@@ -24,7 +22,6 @@ stop() {
 
 reload() {
     if pgrep -f $DAEMON_NAME > /dev/null; then
-        echo "Reloading $DAEMON_NAME..."
         pkill -HUP -f $DAEMON_NAME
         echo "$DAEMON_NAME reloaded."
     else

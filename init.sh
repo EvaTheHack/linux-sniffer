@@ -4,6 +4,6 @@ sudo apt-get install make
 
 make
 
-SNIFFER_PATH=$(readlink -f output/sniffer)
+SNIFFER_PATH=$(readlink -f output/)
 
 export PATH=$PATH:$SNIFFER_PATH
