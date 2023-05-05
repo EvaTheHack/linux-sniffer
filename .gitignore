@@ -17,3 +17,4 @@ _deps
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
+*.txt

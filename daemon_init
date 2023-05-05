@@ -1,0 +1,61 @@
+DAEMON_NAME="mydaemon"
+
+DAEMON_PATH=DEAMON_PATH_VAR
+
+start() {
+    if pgrep -f $DAEMON_NAME > /dev/null; then
+        echo "$DAEMON_NAME is already running."
+    else
+        echo "Starting $DAEMON_NAME..."
+        $DAEMON_PATH &
+        echo "$DAEMON_NAME started."
+    fi
+}
+
+stop() {
+    if pgrep -f $DAEMON_NAME > /dev/null; then
+        echo "Stopping $DAEMON_NAME..."
+        pkill -f $DAEMON_NAME
+        echo "$DAEMON_NAME stopped."
+    else
+        echo "$DAEMON_NAME is not running."
+    fi
+}
+
+reload() {
+    if pgrep -f $DAEMON_NAME > /dev/null; then
+        echo "Reloading $DAEMON_NAME..."
+        pkill -HUP -f $DAEMON_NAME
+        echo "$DAEMON_NAME reloaded."
+    else
+        echo "$DAEMON_NAME is not running."
+    fi
+}
+
+status() {
+    if pgrep -f $DAEMON_NAME > /dev/null; then
+        echo "$DAEMON_NAME is running."
+    else
+        echo "$DAEMON_NAME is not running."
+    fi
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    reload)
+        reload
+        ;;
+    status)
+        status
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|reload|status}"
+        exit 1
+esac
+
+exit 0
