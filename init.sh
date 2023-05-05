@@ -6,4 +6,6 @@ make
 
 SNIFFER_PATH=$(readlink -f output/)
 
-export PATH=$PATH:$SNIFFER_PATH
+echo "PATH=\"$SNIFFER_PATH:\$PATH\"" | sudo tee -a /etc/environment > /dev/null
+
+source /etc/environment

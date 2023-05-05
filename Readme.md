@@ -6,8 +6,7 @@
 ```
 git clone https://github.com/EvaTheHack/linux-sniffer.git
 cd linux-sniffer
-chmod +x init.sh
-chmod +x init_daemon.sh
+chmod +x init.sh & chmod +x init_daemon.sh
 source ./init.sh
 sudo ./init_daemon.sh
 ```
