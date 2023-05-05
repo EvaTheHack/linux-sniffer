@@ -4,70 +4,34 @@ DAEMON_NAME="daemon_sniffer"
 
 DAEMON_PATH=DEAMON_PATH_VAR
 
-is_running() {
-    if [ -f $PID_FILE ]; then
-        pid=$(cat $PID_FILE)
-        if [ -d "/proc/$pid" ]; then
-            return 0 
-        fi
-    fi
-    return 1 
-}
-
-start() {
-    if ! is_running; then
-        sudo $DAEMON_PATH &
-        pid=$!
-        echo $pid > $PID_FILE
-        echo "Daemon started with PID $pid"
-    else
-        echo "Daemon is already running"
-    fi
-}
-
-stop() {
-    if is_running; then
-        kill $(cat $PID_FILE)
-        rm $PID_FILE
-        echo "Daemon stopped"
-    else
-        echo "Daemon is not running"
-    fi
-}
-
-reload() { 
-    if is_running; then
-        kill -HUP $(cat $PID_FILE)
-        echo "Daemon reloaded"
-    else
-        echo "Daemon is not running"
-    fi
-}
-
-status() {
-    if is_running; then
-        echo "Daemon is running with PID $(cat $PID_FILE)"
-    else
-        echo "Daemon is not running"
-    fi
-}
-
 case "$1" in
-    start)
-        start
-        ;;
-    stop)
-        stop
-        ;;
-    reload)
-        reload
-        ;;
-    status)
-        status
-        ;;
-    *)
-        echo "Usage: $0 {start|stop|reload|status}"
-        exit 1
+  start)
+    echo "Starting $DAEMON_NAME"
+    start-stop-daemon --start --quiet --background --exec /bin/bash --chuid root --chdir / -- -c "$DAEMON_PATH start"
+    ;;
+  stop)
+    echo "Stopping $DAEMON_NAME"
+    start-stop-daemon --stop --quiet --background --exec /bin/bash --chuid root --chdir / -- -c "$DAEMON_PATH stop"
+    ;;
+  restart)
+    echo "Restarting $DAEMON_NAME"
+    start-stop-daemon --stop --quiet --background --exec /bin/bash --chuid root --chdir / -- -c "$DAEMON_PATH stop"
+    sleep 1
+    start-stop-daemon --start --quiet --background --exec /bin/bash --chuid root --chdir / -- -c "$DAEMON_PATH start"
+    ;;
+  status)
+    echo "Status of $DAEMON_NAME:"
+    pid=$(pgrep -f "$DAEMON_PATH")
+    if [ "$pid" != "" ]; then
+      echo "$DAEMON_NAME is running with PID $pid"
+    else
+      echo "$DAEMON_NAME is not running"
+    fi
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|status}"
+    exit 1
+    ;;
 esac
 
 exit 0
