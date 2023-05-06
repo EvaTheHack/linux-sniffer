@@ -49,7 +49,6 @@ char **SplitMessage(char message[128], int *count)
     while (token != NULL)
     {
         commands[i] = token;
-        Log(token);
         i++;
         token = strtok(NULL, " ");
     }
