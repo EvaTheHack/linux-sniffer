@@ -13,28 +13,21 @@
 FILE *config;
 FILE *results_path;
 FILE *result;
-FILE *logs;
 
 #define MAX_LINE_LENGTH 100
 #define RESULTS_FOLDER "results"
+#define CONFIG_PATH "config.txt"
 
 const char *RESULT_FORMAT_OUT = "%s %d\n";
 const char *RESULT_FORMAT_IN = "%s %d";
 
 char *GetResultFolderPath();
 char **GetAllResultPaths(int *count);
-void trim(char *str);
-
-void Log(char *message)
-{
-    logs = fopen("log.txt", "a");
-    fprintf(logs, "%s\n", message);
-    fclose(logs);
-}
+void Trim(char *str);
 
 void WriteToConfig(char *iface)
 {
-    config = fopen("config.txt", "w");
+    config = fopen(CONFIG_PATH, "w");
     int length = strlen(iface);
     for (int i = 0; i < length; i++)
     {
@@ -45,20 +38,20 @@ void WriteToConfig(char *iface)
 
 char *ReadConfig()
 {
-    char myString[10];
-    config = fopen("config.txt", "r");
+    char string[10];
+    config = fopen(CONFIG_PATH, "r");
     if (config == NULL)
     {
-        result = fopen("config.txt", "w");
+        result = fopen(CONFIG_PATH, "w");
         fclose(result);
-        result = fopen("config.txt", "r");
+        result = fopen(CONFIG_PATH, "r");
     }
-    fgets(myString, 10, config);
+    fgets(string, 10, config);
     fclose(config);
     char *iface = malloc(10);
     for (int i = 0; i < 10; i++)
     {
-        iface[i] = myString[i];
+        iface[i] = string[i];
     }
     return iface;
 }
@@ -68,7 +61,7 @@ void WriteToResult(char *filename, ListIp list)
     char path[128];
     char *extension = ".txt";
     
-    trim(filename);
+    Trim(filename);
 
     snprintf(path, 128, "%s/%s%s", RESULTS_FOLDER, filename, extension);
     
@@ -87,8 +80,12 @@ ListIp ReadFromResult(char *filename)
     ListIp list;
     char path[128];
     char *extension = "txt";
-    
-    trim(filename);
+    int capacity = 1;
+    int count = 0;
+    Ip *ips = malloc(capacity * sizeof(Ip));
+    char line[MAX_LINE_LENGTH];
+
+    Trim(filename);
     snprintf(path, 128, "%s/%s.%s", RESULTS_FOLDER, filename, extension);
 
     result = fopen(path, "r");
@@ -99,12 +96,6 @@ ListIp ReadFromResult(char *filename)
         result = fopen(path, "r");
     }
 
-    int capacity = 1;
-    int count = 0;
-
-    Ip *ips = malloc(capacity * sizeof(Ip));
-
-    char line[MAX_LINE_LENGTH];
     while (fgets(line, MAX_LINE_LENGTH, result))
     {
         Ip ip;
@@ -141,10 +132,11 @@ ListIp GetAllFromResults()
     for (int i = 0; i < *count_ptr; i++)
     {
         char path[128];
+        char line[MAX_LINE_LENGTH];
+
         snprintf(path, 128, "%s/%s", RESULTS_FOLDER, files[i]);
         result = fopen(path, "r");
 
-        char line[MAX_LINE_LENGTH];
         while (fgets(line, MAX_LINE_LENGTH, result))
         {
             found = 0;
@@ -260,7 +252,7 @@ int CheckIfFileExist(char *filename)
     return 0;
 }
 
-void trim(char *str)
+void Trim(char *str)
 {
     int len = strlen(str);
     while (len > 0 && isspace(str[len - 1]))

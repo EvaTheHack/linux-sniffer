@@ -65,7 +65,7 @@ void *Start(void *data)
 	char iface_str[10];
 	int saddr_size, data_size;
 	struct sockaddr saddr;
-	trim(iface);
+	Trim(iface);
 	for (int i = 0; i < strlen(iface); i++) 
 	{
 		iface_str[i] = iface[i];
