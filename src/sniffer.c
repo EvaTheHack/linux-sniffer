@@ -3,22 +3,24 @@
 #include <netinet/in.h>
 #include <errno.h>
 #include <netdb.h>
-#include <stdio.h>	//For standard things
-#include <stdlib.h> //malloc
-#include <string.h> //strlen
+#include <stdio.h>	
+#include <stdlib.h> 
+#include <string.h> 
 
-#include <netinet/ip_icmp.h>  //Provides declarations for icmp header
-#include <netinet/udp.h>	  //Provides declarations for udp header
-#include <netinet/tcp.h>	  //Provides declarations for tcp header
-#include <netinet/ip.h>		  //Provides declarations for ip header
-#include <netinet/if_ether.h> //For ETH_P_ALL
-#include <net/ethernet.h>	  //For ether_header
+#include <netinet/ip_icmp.h>  
+#include <netinet/udp.h>	  
+#include <netinet/tcp.h>	  
+#include <netinet/ip.h>		  
+#include <netinet/if_ether.h> 
+#include <net/ethernet.h>	  
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <pthread.h>
+
 
 #define IFACE_LENGTH 10
 

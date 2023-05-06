@@ -54,7 +54,7 @@ int main(int argc, char **argv)
 
     if(strcmp(message_snd.mtext, message_get.mtext) == 0)
     {
-        PrintError("Daemon did not receive request. Try to run on daemon.");
+        PrintError("Daemon did not receive request. Make sure that daemon turned on");
         return 0;
     }
 

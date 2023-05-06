@@ -1,32 +1,50 @@
-#include "file.c"
 #include "sniffer.c"
 
+#define MSGSZ 1024
+
+typedef struct message
+{
+    long mtype;
+    char mtext[MSGSZ];
+} message;
+
+pthread_t thread;
 int message_id;
+
 int CheckIfIfaceExist(char *iface);
 int IsIfaceMatchMask(char *iface);
+void MapListToBuffer(ListIp list, char *buffer);
+int StartWith(const char *str, const char *substr);
+void SendMessage(char *msg, int msgid, int type);
+int Compare(char *command, char *static_command);
 
-void Start()
+void StartSniff()
 {
     char *iface = ReadConfig();
     pthread_create(&thread, NULL, Start, (void *)iface);
-    SendMessage("Sniffer started", msgid, message_id);
+    SendMessage("Sniffer started", message_id, 1);
 }
 
 void Stop()
 {
     StopSniffing();
-    SendMessage("Sniffer stopped", msgid, message_id);
+    SendMessage("Sniffer stopped", message_id, 1);
 }
 
 void Show(char *ip)
 {
+    if(ip == NULL)
+    {
+        SendMessage("You must provide ip", message_id, 2);
+        return;
+    }
     char *iface = ReadConfig();
     ListIp list = ReadFromResult(iface);
 
     int id = IfExistGetId(list, ip);
     if (id == -1)
     {
-        SendMessage("This is ip does not exist in list", msgid, 2);
+        SendMessage("This is ip does not exist in list", message_id, 2);
     }
     else
     {
@@ -34,7 +52,7 @@ void Show(char *ip)
         Ip ip = list.ips[id];
         sprintf(buffer, "IP: %s; Count:%d\n", ip.address, ip.count);
 
-        SendMessage(buffer, msgid, 1);
+        SendMessage(buffer, message_id, 1);
     }
 }
 
@@ -42,7 +60,13 @@ void Select(char *iface)
 {
     if (IsRunning)
     {
-        SendMessage("You can not change iface while it works", msgid, 2);
+        SendMessage("You can not change iface while it works", message_id, 2);
+        return;
+    }
+
+    if(iface == NULL)
+    {
+        SendMessage("You must provide iface", message_id, 2);
         return;
     }
 
@@ -50,7 +74,7 @@ void Select(char *iface)
 
     if (!isGoodIface)
     {
-        SendMessage("Allowed only eth and wlan ifaces", msgid, 2);
+        SendMessage("Allowed only eth and wlan ifaces", message_id, 2);
         return;
     }
 
@@ -59,73 +83,69 @@ void Select(char *iface)
     if(isIfaceExist)
     {
         WriteToConfig(iface);
-        SendMessage("Iface has been setuped\n", msgid, 1);
+        SendMessage("Iface has been setuped\n", message_id, 1);
         return;
     }
 
-    SendMessage("This iface is unavailable", msgid, 2);
+    SendMessage("This iface is unavailable", message_id, 2);
 }
 
-void Stat(char *iface)
+void Stat(char *iface, int count)
 {
     char buffer[MSGSZ];
     buffer[0] = '\0';
-
-    int isGoodIface = IsIfaceMatchMask(iface);
-    int isIfaceExist = CheckIfIfaceExist(iface);
-    if (iface == NULL || isGoodIface || isIfaceExist)
+    if (count == 1)
     {
         ListIp list = GetAllFromResults();
         MapListToBuffer(list, buffer);
-        
-        SendMessage(buffer, msgid, 1);
+        SendMessage(buffer, message_id, 1);
         return;
     }
     
-    if (!CheckIfFileExist(iface))
+    int isFileExist = CheckIfFileExist(iface);
+    if (!isFileExist)
     {
-        SendMessage("Make sure, that file for this iface exist", msgid, 2);
+        SendMessage("Make sure, that file for this iface exist", message_id, 2);
         return;
     }
 
     ListIp list = ReadFromResult(iface);
     MapListToBuffer(list, buffer);
-    SendMessage(buffer, msgid, 1);
+    SendMessage(buffer, message_id, 1);
 }
 
-void HandleCommands(char **commands, int msgid)
+void HandleCommands(char **commands, int msgid, int *count)
 {
     message_id = msgid;
+    char *command = commands[0];
 
-    char *command_ptr = commands[0];
-    int len = strlen(command_ptr); 
-   
-    char command[len+1]; 
-    
-    for (int i = 0; i < len; i++) {
-        command[i] = *(command_ptr+i);
-    }
-   
-    command[len] = '\0';
-    switch(command)
+    if(Compare(command, "start"))
     {
-        case "start":
-            Start();
-            break;
-        case "stop":
-            Stop();
-            break;
-        case "show":
-            Show(commands[1]);
-            break;
-        case "select":
-            Select(commands[2]);
-            break;
-        case "stat":
-            Stat();
-            break;
-        
+        StartSniff();
+        return;
     }
+    if(Compare(command, "stop"))
+    {
+        Stop();
+        return;
+    }
+    if(Compare(command, "show"))
+    {
+        Show(commands[1]);
+        return;
+    }
+    if(Compare(command, "select") && commands[1] != NULL && Compare(commands[1], "iface"))
+    {
+        Select(commands[2]);
+        return;
+    }
+    if(Compare(command, "stat"))
+    {
+        Stat(commands[1], *count);
+        return;
+    }
+
+    SendMessage("Wrong command. Use --help", message_id, 2);
 }
 
 int IsIfaceMatchMask(char *iface)
@@ -162,4 +182,48 @@ void MapListToBuffer(ListIp list, char *buffer)
         sprintf(formatted, "IP: %s; Count:%d\n", ip.address, ip.count);
         strcat(buffer, formatted);
     }
+}
+
+/// type
+/// 1 - INFO
+/// 2 - ERROR
+void SendMessage(char *msg, int msgid, int type)
+{
+    message message_buf;
+    size_t buf_length;
+
+    memset(&message_buf, 0, sizeof(message_buf));
+    message_buf.mtype = type;
+    strncpy(message_buf.mtext, msg, MSGSZ);
+
+    buf_length = strlen(message_buf.mtext) + 1;
+
+    if (msgsnd(msgid, &message_buf, buf_length, IPC_NOWAIT) < 0)
+    {
+        perror("msgsnd");
+        return;
+    }
+}
+
+int StartWith(const char *str, const char *substr)
+{
+    int lenstr = strlen(str);
+    int lensubstr = strlen(substr);
+
+    if (lensubstr > lenstr)
+    {
+        return 0;
+    }
+
+    return strncmp(substr, str, lensubstr) == 0;
+}
+
+int Compare(char *command, char *static_command)
+{
+    if(strcmp(command, static_command) == 0)
+    {
+        return 1;
+    }
+
+    return 0;
 }
