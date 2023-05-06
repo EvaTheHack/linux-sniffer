@@ -76,13 +76,8 @@ void Stat(char *iface)
     if (iface == NULL || isGoodIface || isIfaceExist)
     {
         ListIp list = GetAllFromResults();
-        for (int i = 0; i < list.count; i++)
-        {
-            char formatted[30];
-            Ip ip = list.ips[i];
-            sprintf(formatted, "IP: %s; Count:%d\n", ip.address, ip.count);
-            strcat(buffer, formatted);
-        }
+        MapListToBuffer(list, buffer);
+        
         SendMessage(buffer, msgid, 1);
         return;
     }
@@ -94,13 +89,7 @@ void Stat(char *iface)
     }
 
     ListIp list = ReadFromResult(iface);
-    for (int i = 0; i < list.count; i++)
-    {
-        char formatted[30];
-        Ip ip = list.ips[i];
-        sprintf(formatted, "IP: %s; Count:%d\n", ip.address, ip.count);
-        strcat(buffer, formatted);
-    }
+    MapListToBuffer(list, buffer);
     SendMessage(buffer, msgid, 1);
 }
 
@@ -164,7 +153,13 @@ int CheckIfIfaceExist(char *iface)
     return 0;
 }
 
-void MapListToBuffer()
+void MapListToBuffer(ListIp list, char *buffer)
 {
-    
+    for (int i = 0; i < list.count; i++)
+    {
+        char formatted[30];
+        Ip ip = list.ips[i];
+        sprintf(formatted, "IP: %s; Count:%d\n", ip.address, ip.count);
+        strcat(buffer, formatted);
+    }
 }
